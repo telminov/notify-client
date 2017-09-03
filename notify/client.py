@@ -80,7 +80,7 @@ class NotifyClient(object):
             'type': consts.CALL_TYPE,
             'answers': answers or self.get_answers(),
             'delay': delay or self.get_delay(),
-            'phones': ['+79998191252', ], #phone_numbers or self.get_phone_numbers(),
+            'phones': phone_numbers or self.get_phone_numbers(),
             
             'handler_token': handler_token or self.get_handler_token(),
             'handler_url': handler_url or self.get_handler_url(),
