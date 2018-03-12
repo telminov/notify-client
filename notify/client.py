@@ -94,10 +94,12 @@ class NotifyClient(object):
         elif message:
             notify_data['message'] = message
 
-        return self._preparation_data(
+        data = self.preparation_data(
             data=notify_data,
             files=files
         )
+
+        return create_notify(data)
 
     def create_message(self, message=None, phone_numbers=None, handler_token=None, handler_url=None, handler_data=None):
         """
@@ -116,7 +118,7 @@ class NotifyClient(object):
         assert handler_url is None or isinstance(handler_url, six.string_types)
         assert handler_data is None or isinstance(handler_data, self.JSON_DUMP_TYPES)
 
-        return self._preparation_data(
+        data = self.preparation_data(
             data={
                 'type': consts.MESSAGE_TYPE,
                 'message': message,
@@ -127,6 +129,8 @@ class NotifyClient(object):
             }
 
         )
+
+        return create_notify(data)
 
     def create_notify(self, **request_data):
 
@@ -189,7 +193,7 @@ class NotifyClient(object):
         }
 
 
-    def _preparation_data(self, **request_data):
+    def preparation_data(self, **request_data):
         data = request_data.get('data')
         files = request_data.get('files', '')
 
@@ -202,12 +206,10 @@ class NotifyClient(object):
 
         data = self._dump_data(data)
 
-        return self.create_notify(
-            {
+        return {
             'data': data,
             'files': files
         }
-        )
 
     @staticmethod
     def _dump_data(data=None):
