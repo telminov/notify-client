@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='notify-client',
-    version='0.0.1',
+    version='0.0.2',
     description='Soft Way company notify service client.',
     author='Telminov Sergey',
     author_email='sergey@telminov.ru',
