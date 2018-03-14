@@ -94,10 +94,12 @@ class NotifyClient(object):
         elif message:
             notify_data['message'] = message
 
-        return self.create_notify(
+        data = self.preparation_data(
             data=notify_data,
             files=files
         )
+
+        return create_notify(data)
 
     def create_message(self, message=None, phone_numbers=None, handler_token=None, handler_url=None, handler_data=None):
         """
@@ -116,7 +118,7 @@ class NotifyClient(object):
         assert handler_url is None or isinstance(handler_url, six.string_types)
         assert handler_data is None or isinstance(handler_data, self.JSON_DUMP_TYPES)
 
-        return self.create_notify(
+        data = self.preparation_data(
             data={
                 'type': consts.MESSAGE_TYPE,
                 'message': message,
@@ -128,12 +130,9 @@ class NotifyClient(object):
 
         )
 
-    def create_notify(self, **request_data):
-        post_data = request_data.get('data')
+        return create_notify(data)
 
-        assert post_data
-        assert post_data.get('phones')
-        assert post_data.get('message') or post_data.get('record_file') or post_data.get('record_file_url')
+    def create_notify(self, **request_data):
 
         try:
             response = requests.post(url=self.get_notify_url(), headers=self.get_headers(), **request_data)
@@ -147,7 +146,8 @@ class NotifyClient(object):
 
     def get_headers(self):
         return {
-            'Authorization': 'Token %s' % self.get_auth_token()
+            'Authorization': 'Token %s' % self.get_auth_token(),
+            'Content-Type': 'application/json'
         }
 
     def get_phone_numbers(self):
@@ -190,6 +190,25 @@ class NotifyClient(object):
     def make_error(message):
         return {
             'error': message
+        }
+
+
+    def preparation_data(self, **request_data):
+        data = request_data.get('data')
+        files = request_data.get('files', '')
+
+        assert data
+        assert data.get('phones')
+        assert data.get('message') or files.get('record_file') or files.get('record_file_url')
+
+        if data.get('handler_data') == None:
+            data.pop('handler_data')
+
+        data = self._dump_data(data)
+
+        return {
+            'data': data,
+            'files': files
         }
 
     @staticmethod
